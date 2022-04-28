@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+
+    <!-- Reference to the Bing Maps SDK -->
+    <script type='text/javascript'
+            src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=ApUQTTD7OuoyaVORYS25t6IzE0p9Pw_IVzQr1rRDycxQRf7vRRTgsOKULj3nvAL3'
+            async defer></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="other">
+        <div id="menu-side">
+            <div class="head">
+                <span class="back">&#8592</span>
+                <span class="title">Chi tiết chỉ đường</span>
+            </div>
+            <div id="details"></div>
+            <div class="no-info">Không có thông tin</div>
+        </div> 
+        <div id="menu">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </div>
+        <select id="vehicle"></select>
+        <!-- <div class="input-side">
+            <div class="find-side">
+                <span>Từ:</span><input type="text" id="find-address-from" class="find">
+                <button class="visitMapFrom">xem</button>
+            </div> 
+            <ul class="suggest-side from"></ul>
+        </div> -->
+        <div class="input-side">
+            <div class="find-side">
+                <span>Đến:</span><input type="text" id="find-address-to" class="find">
+                <button class="visitMapTo">xem</button>
+            </div> 
+            <ul class="suggest-side to"></ul>
+        </div>
+        <!-- <button id="direction">Tìm Đường</button>  -->
+        <!-- <button id="a">a</button>  -->
+    </div>
+    <div id="map"></div>
+    <div id="test"></div>
+    <script src="./index.js"></script>
+    <script src="./model/place.js"></script>
+    <script src="./model/findPlace.js"></script>
+    <script src="./model/findPath.js"></script>
+    <script src="./controllView/map.js"></script>
+    <script src="./model/vehicle.js"></script>
+</body>
+</html>
