@@ -11,7 +11,10 @@ function hideDetails(){
 }
 
 function hideSuggestRoute(){
-    document.querySelector("li:not(.selected)").style.display = "none"
+    var lis = document.querySelectorAll("li:not(.selected)")
+    lis.forEach(e => {
+        e.style.display = "none"
+    })
 }
 
 function clearDetails(){
