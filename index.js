@@ -35,7 +35,7 @@ selectVehicle.onchange = e => {
 
 function createVehicle() {
     vehicles = [new Vehicle("car", new Microsoft.Maps.Location(21.023729849592034, 105.803293897214), "Tốt"),
-    new Vehicle("car 1hjdfd", new Microsoft.Maps.Location(21.027377958761136, 105.78551963954398, "Tốt"))]
+    new Vehicle("car 1", new Microsoft.Maps.Location(21.027377958761136, 105.78551963954398, "Tốt"))]
 
     var count = 0
     vehicles.forEach(e => {
