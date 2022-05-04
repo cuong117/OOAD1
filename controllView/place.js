@@ -1,7 +1,6 @@
 const bing_map_key = "AlBNU0mQXvdQU1b1JTEi5YZElIvaX3TFP5ov3pR_5Xq4pl2XEDA3mccLe3fClWZ3"
 var address = [null, null]
 var add_address = [false, false]
-// var input = [input_address_from, input_address_to]
 var input = [0, input_address_to]
 var infobox = [null, null]
 var map
@@ -19,65 +18,34 @@ function GetMap() {
 
     createVehicle()
     createStartPin(0)
-    Microsoft.Maps.Events.addHandler(map, 'rightclick', async function(e){
-        // var finish = false
+    Microsoft.Maps.Events.addHandler(map, 'rightclick',async function(e){
         map.layers.clear()
         document.querySelector("#details").innerHTML = ""
-        var name = await getAddress(e.location)
+        var name = await FindAddress.getAddressFromLocation(e.location)
+
         createPushpin(e.location.latitude, e.location.longitude, 1, name)
         input[1].value = name
-        //getPath()
-        // for (var i = 0; i < 2; i++){
-        //     if(!address[i]){
-        //         createPushpin(e.location.latitude, e.location.longitude, i, name)
-        //         input[i].value = name
-        //         finish = true;
-        //         break;
-        //     }
-        // }
-
-        // if(!finish){
-        //     for (var i = 0; i < 2; i++){
-        //         if(!add_address[i]){
-        //             createPushpin(e.location.latitude, e.location.longitude, i, name)
-        //             input[i].value = name
-        //             finish = true;
-        //             break;
-        //         }
-        //     }
-        // }
-
 
     })
 }
 
-function addSuggest(resources, input) {
+function addSuggest(place, input) {
     var fullAddress = ""
     var nameAddress = ""
-    var p = new Place(resources.address.addressLine, resources.address.locality,
-        resources.address.adminDistrict2, resources.address.adminDistrict, resources.address.formattedAddress, resources.name)
-    // console.log(p.name)
-    fullAddress = p.getFullName()
-    nameAddress = p.getAddressName()
+    fullAddress = place.getFullName()
+    nameAddress = place.getAddressName()
     var li = document.createElement('li')
     li.className = "suggestElememt"
-    li.setAttribute('data', p.getQuery())
+    li.setAttribute('data', place.getQuery())
     li.innerHTML = `
     <label class="nameAddress">${nameAddress}</label></br>
     <label class="fullAddress">${fullAddress}</label>
     <hr>`
     li.onclick = e => {
         input.blur()
-        // if(input == input_address_from)
-        //     getGeo(e, 0)
-        /* else */ 
         if(input == input_address_to){
             getGeo(e, 1)
-            // map.layers.clear()
-            // getPath()
-            // visitPin(address[1])
         }
-        // getPath()
         input.value = e.currentTarget.querySelector(".nameAddress").textContent
     }
     li.onmousedown = e => {
@@ -86,33 +54,14 @@ function addSuggest(resources, input) {
     return li
 }
 
-function getGeo(e, index) {
-    var latitude;
-    var longitude;
+async function getGeo(e, index) {
+    var location
     var address_data = e.currentTarget.getAttribute('data')
-    fetch("http://dev.virtualearth.net/REST/v1/Locations?" + new URLSearchParams({
-        query: address_data,
-        maxResults: 1,
-        key: bing_map_key
-    }))
-        .then(res => res.json())
-        .then(data => {
-            data.resourceSets.forEach(element => {
-                latitude = element.resources[0].point.coordinates[0]
-                longitude = element.resources[0].point.coordinates[1]
-                createPushpin(latitude, longitude, index, address_data)
-                console.log(address_data)
-                // visitPin(address[index])
-            })
-        })
+    location = await FindAddress.getLocation(address_data)
+    createPushpin(location.latitude, location.longitude, index, address_data)
 }
 
-async function getAddress(location){
-    var res = await fetch(`http://dev.virtualearth.net/REST/v1/Locations/${location.latitude},${location.longitude}?` + 
-    new URLSearchParams({
-        key: bing_map_key
-    }))
-    var data = await res.json()
+function getAddress(data){
     var name = data.resourceSets[0].resources[0].name;
     var namearr = name.split(',')
     namearr.pop()
@@ -123,15 +72,11 @@ async function getAddress(location){
 }
 
 function createPushpin(latitude, longitude, index, des) {
-    // add_address[index] = true
-    // add_address[(index + 1) % 2] = false
     console.log(des)
     if (address[index]) {
         map.entities.remove(address[index])
     }
-    // console.log(latitude, longitude)
     var location = new Microsoft.Maps.Location(latitude, longitude)
-    // console.log(location)
     var color = "red"
     var title = "Điểm đến"
     if (!index){
@@ -161,7 +106,7 @@ function createPushpin(latitude, longitude, index, des) {
                 label: 'Bắt Đầu',
                 eventHandler: () => {
                     console.log("start")
-                    setMove()
+                    FindPath.setMove()
                 }
             }]
         })
@@ -186,34 +131,20 @@ function createPushpin(latitude, longitude, index, des) {
     map.entities.push(pin)
     address[index] = pin
     if(index || (!index && address[1]) ){
-        //console.log("d")
         map.layers.clear()
-        getPath()
+        FindPath.getPath()
     }
 }
 
-function getSuggest(e, list) {
+async function getSuggest(e, list) {
     list.innerHTML = ""
-    if (e.target.value != "")
-        fetch("http://dev.virtualearth.net/REST/v1/Autosuggest?" + new URLSearchParams({
-            key: bing_map_key,
-            query: e.target.value,
-            ur: "VN",
-            c: "vi",
-            cf: "VN",
-            o: "JSON"
-        }))
-            .then(res => res.json())
-            .then(data => {
-                console.log(data)
-                data.resourceSets.forEach(element => {
-                    element.resources.forEach(data => {
-                        data.value.forEach(element1 => {
-                            list.append(addSuggest(element1, e.target))
-                        })
-                    })
-                })
-            })
+    if (e.target.value != ""){
+        var place = await FindAddress.getSuggestAddress(e.target.value)
+
+        place.forEach(element => {
+            list.append(addSuggest(element, e.target))
+        })
+    }
 }
 
 function visitLocation(e, index){
@@ -234,6 +165,6 @@ function visitPin(pin){
 async function createStartPin(index){
     var vehicle = vehicles[index] 
     var location = vehicle.getLocation()
-    createPushpin(location.latitude, location.longitude, 0,await vehicle.getAddressName())
+    createPushpin(location.latitude, location.longitude, 0,await FindAddress.getAddressOfVehicle(vehicle))
     visitPin(address[0])
 }

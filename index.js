@@ -1,28 +1,11 @@
 var test = document.querySelector("#click")
-// var input_address_from = document.querySelector('#find-address-from')
-// var list_address_from = document.querySelector('.from')
-// var visit_address_from = document.querySelector('.visitMapFrom')
 var input_address_to = document.querySelector('#find-address-to')
 var list_address_to = document.querySelector('.to')
 var visit_address_to = document.querySelector('.visitMapTo')
 var menu = document.querySelector('#menu')
 var menuSide = document.querySelector('#menu-side')
 var back = document.querySelector('.back')
-// var direction = document.querySelector('#direction')
-// var a = document.querySelector("#a")
 var selectVehicle = document.querySelector('#vehicle')
-
-// input_address_from.oninput = e => {
-//     getSuggest(e, list_address_from)
-// }
-
-// visit_address_from.onmousedown = e => {
-//     e.preventDefault()
-// }
-
-// visit_address_from.onclick = e => {
-//     visitLocation(e, 0)
-// }
 
 input_address_to.oninput = e => {
     getSuggest(e, list_address_to)
@@ -45,15 +28,25 @@ menu.onclick = e => {
     showDetails(e)
 }
 
-// direction.onclick = async () => {
-//     getPath()
-// }
-
-// a.onclick = e => {
-//     removePolyLine()
-// }
-
 selectVehicle.onchange = e => {
-    // createStartPin(e.currentTarget.)
     createStartPin(e.currentTarget.selectedIndex)
+}
+
+
+function createVehicle() {
+    vehicles = [new Vehicle("car", new Microsoft.Maps.Location(21.023729849592034, 105.803293897214), "Tốt"),
+    new Vehicle("car 1hjdfd", new Microsoft.Maps.Location(21.027377958761136, 105.78551963954398, "Tốt"))]
+
+    var count = 0
+    vehicles.forEach(e => {
+        var op = document.createElement("option")
+        op.innerHTML = `${e.getName()}`
+        op.setAttribute("data", count)
+        selectVehicle.append(op)
+    })
+}
+
+function updateVehicle(location){
+    var index = selectVehicle.selectedIndex
+    vehicles[index].setLocation(location)
 }
